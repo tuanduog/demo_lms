@@ -25,4 +25,5 @@ public class AssignmentSection {
 
     @Column(name = "question_type")
     private String questionType;
+
 }
