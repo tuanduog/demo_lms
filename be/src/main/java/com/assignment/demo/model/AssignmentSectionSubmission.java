@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 public class AssignmentSectionSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "assignments_section_submission_id")
+    @Column(name = "assignment_section_submission_id")
     private Long ID;
 
     // FK: assignments_section_id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignments_section_id")
+    @JoinColumn(name = "assignment_section_id")
     private AssignmentSection assignmentSection;
 
     @Column(name = "section_score")
@@ -23,4 +23,44 @@ public class AssignmentSectionSubmission {
     @Column(name = "saved_at")
     private LocalDateTime savedAt;
 
+    public AssignmentSectionSubmission() {
+    }
+
+    public AssignmentSectionSubmission(AssignmentSection assignmentSection, Double sectionScore, LocalDateTime savedAt) {
+        this.assignmentSection = assignmentSection;
+        this.sectionScore = sectionScore;
+        this.savedAt = savedAt;
+    }
+
+    public Long getID() {
+        return ID;
+    }
+
+    public void setID(Long ID) {
+        this.ID = ID;
+    }
+
+    public AssignmentSection getAssignmentSection() {
+        return assignmentSection;
+    }
+
+    public void setAssignmentSection(AssignmentSection assignmentSection) {
+        this.assignmentSection = assignmentSection;
+    }
+
+    public Double getSectionScore() {
+        return sectionScore;
+    }
+
+    public void setSectionScore(Double sectionScore) {
+        this.sectionScore = sectionScore;
+    }
+
+    public LocalDateTime getSavedAt() {
+        return savedAt;
+    }
+
+    public void setSavedAt(LocalDateTime savedAt) {
+        this.savedAt = savedAt;
+    }
 }

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "assignments_id")
+    @Column(name = "assignment_id")
     private Long id;
 
     @Column(name = "title")
@@ -36,6 +36,6 @@ public class Assignment {
     @Column(name = "modified_at")
     private LocalDateTime modifiedAt;
 
-    @Column(name = "assignments_type")
+    @Column(name = "assignment_type")
     private String assignmentType;
 }

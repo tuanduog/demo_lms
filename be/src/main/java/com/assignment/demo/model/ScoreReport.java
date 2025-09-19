@@ -15,7 +15,7 @@ public class ScoreReport {
 
     // FK: assignments_id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignments_id")
+    @JoinColumn(name = "assignment_id")
     private Assignment assignment;
 
     // FK: student_id
@@ -29,4 +29,53 @@ public class ScoreReport {
     @Column(name = "grading_status")
     private String gradingStatus;
 
+    public ScoreReport() {
+    }
+
+    public ScoreReport(Assignment assignment, Student student, LocalDateTime createdAt, String gradingStatus) {
+        this.assignment = assignment;
+        this.student = student;
+        this.createdAt = createdAt;
+        this.gradingStatus = gradingStatus;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Assignment getAssignment() {
+        return assignment;
+    }
+
+    public void setAssignment(Assignment assignment) {
+        this.assignment = assignment;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getGradingStatus() {
+        return gradingStatus;
+    }
+
+    public void setGradingStatus(String gradingStatus) {
+        this.gradingStatus = gradingStatus;
+    }
 }
