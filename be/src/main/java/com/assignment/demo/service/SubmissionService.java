@@ -1,5 +1,6 @@
 package com.assignment.demo.service;
 
+import com.assignment.demo.dto.CorrectAnswerDTO;
 import com.assignment.demo.dto.QuestionAnswerDTO;
 import com.assignment.demo.model.*;
 import com.assignment.demo.repository.*;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SubmissionService {
@@ -43,19 +45,26 @@ public class SubmissionService {
     }
     public void submitAutoGrading(Long scoreReportID, long sectionID, List<QuestionAnswerDTO> list){
         List<QuestionSubmission> questionSubmissions= new ArrayList<>();
-        for(QuestionAnswerDTO answer: list ){
-            if(answer.getSectionID()==sectionID){
-                questionSubmissions.add(new QuestionSubmission(
-                        scoreReportRepository.getReferenceById(scoreReportID),
-                        assignmentSectionRepository.getReferenceById(Math.toIntExact(answer.getSectionID())),
-                        questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
-                        answer.getStudentAnswer(),
-                        null,
-                        null
-                ));
+        List<CorrectAnswerDTO> answerList=null;
+        Map<Long, CorrectAnswerDTO> answerMap=null;
+        try{
+            for(QuestionAnswerDTO answer: list ){
+                if(answer.getSectionID()==sectionID){
+                    questionSubmissions.add(new QuestionSubmission(
+                            scoreReportRepository.getReferenceById(scoreReportID),
+                            assignmentSectionRepository.getReferenceById(Math.toIntExact(answer.getSectionID())),
+                            questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
+                            answer.getStudentAnswer(),
+                            null,
+                            answer.getStudentAnswer().equalsIgnoreCase(answerMap.get(answer.getQuestionID()).getAnswerContent())
+                    ));
+                }
             }
+            questionSubmissionRepository.saveAll(questionSubmissions);
         }
-        questionSubmissionRepository.saveAll(questionSubmissions);
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
     public void submitManualGrading(Long scoreReportID, long sectionID, List<QuestionAnswerDTO> list){
         List<QuestionSubmission> questionSubmissions= new ArrayList<>();

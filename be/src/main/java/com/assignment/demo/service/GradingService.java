@@ -22,6 +22,11 @@ public class GradingService {
     ScoreVersionRepository scoreVersionRepository;
     @Autowired
     QuestionSubmissionRepository questionSubmissionRepository;
+
+    //addScore
+    //update score in questionSubmission
+    //add scoreVersion according to the latest modified_at
+    //Change the grading status in report
     public String addScore(Long id, GradingDTO grading){
         ScoreVersion scoreVersion= new ScoreVersion(
                 scoreReportRepository.getReferenceById(id),
@@ -32,11 +37,13 @@ public class GradingService {
         QuestionSubmission questionSubmission=questionSubmissionRepository.findByScoreReport_Id(id);
         questionSubmission.setScore(grading.getScore());
         questionSubmissionRepository.save(questionSubmission);
+
         ScoreVersion sv=scoreVersionRepository.findTopByScoreReport_IdOrderByModifiedAtDesc(id).orElse(null);
         if(sv!=null){
             scoreVersion.setScore(grading.getScore()+sv.getScore());
         }
         scoreVersionRepository.save(scoreVersion);
+
         ScoreReport scoreReport=scoreReportRepository.findById(id).orElse(null);
         if(scoreReport!=null){
             scoreReport.setGradingStatus("true");
