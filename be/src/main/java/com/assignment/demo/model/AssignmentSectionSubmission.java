@@ -1,11 +1,17 @@
 package com.assignment.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "assignment_section_subission")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AssignmentSectionSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,45 +28,9 @@ public class AssignmentSectionSubmission {
 
     @Column(name = "saved_at")
     private LocalDateTime savedAt;
-
-    public AssignmentSectionSubmission() {
-    }
-
     public AssignmentSectionSubmission(AssignmentSection assignmentSection, Double sectionScore, LocalDateTime savedAt) {
         this.assignmentSection = assignmentSection;
         this.sectionScore = sectionScore;
-        this.savedAt = savedAt;
-    }
-
-    public Long getID() {
-        return ID;
-    }
-
-    public void setID(Long ID) {
-        this.ID = ID;
-    }
-
-    public AssignmentSection getAssignmentSection() {
-        return assignmentSection;
-    }
-
-    public void setAssignmentSection(AssignmentSection assignmentSection) {
-        this.assignmentSection = assignmentSection;
-    }
-
-    public Double getSectionScore() {
-        return sectionScore;
-    }
-
-    public void setSectionScore(Double sectionScore) {
-        this.sectionScore = sectionScore;
-    }
-
-    public LocalDateTime getSavedAt() {
-        return savedAt;
-    }
-
-    public void setSavedAt(LocalDateTime savedAt) {
         this.savedAt = savedAt;
     }
 }

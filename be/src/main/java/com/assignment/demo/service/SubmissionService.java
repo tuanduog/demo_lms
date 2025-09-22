@@ -26,7 +26,7 @@ public class SubmissionService {
     @Autowired
     QuestionSubmissionRepository questionSubmissionRepository;
 
-    public void submitAnswer(int assignmentID, int scoreReportID, List<QuestionAnswerDTO> list){
+    public void submitAnswer(Long assignmentID, Long scoreReportID, List<QuestionAnswerDTO> list){
         List<AssignmentSection> sectionList= assignmentSectionRepository.findByAssignmentId(assignmentID);
         for(AssignmentSection as: sectionList){
             assignmentSectionSubmissionRepository.save(new AssignmentSectionSubmission(
@@ -41,7 +41,7 @@ public class SubmissionService {
             }
         }
     }
-    public void submitAutoGrading(int scoreReportID, long sectionID, List<QuestionAnswerDTO> list){
+    public void submitAutoGrading(Long scoreReportID, long sectionID, List<QuestionAnswerDTO> list){
         List<QuestionSubmission> questionSubmissions= new ArrayList<>();
         for(QuestionAnswerDTO answer: list ){
             if(answer.getSectionID()==sectionID){
@@ -57,7 +57,7 @@ public class SubmissionService {
         }
         questionSubmissionRepository.saveAll(questionSubmissions);
     }
-    public void submitManualGrading(int scoreReportID, long sectionID, List<QuestionAnswerDTO> list){
+    public void submitManualGrading(Long scoreReportID, long sectionID, List<QuestionAnswerDTO> list){
         List<QuestionSubmission> questionSubmissions= new ArrayList<>();
         for(QuestionAnswerDTO answer: list ){
             if(answer.getSectionID()==sectionID){

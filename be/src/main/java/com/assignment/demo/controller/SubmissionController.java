@@ -32,8 +32,8 @@ public class SubmissionController {
         return new Assignment();
     }
     @PostMapping("/{id}")
-    public List<QuestionSubmission> submitAssignment(@PathVariable int id, @RequestBody List<QuestionAnswerDTO> answerList){
-        int scoreReportID= scoreReportService.addAndGetScoreReport(
+    public List<QuestionSubmission> submitAssignment(@PathVariable Long id, @RequestBody List<QuestionAnswerDTO> answerList){
+        Long scoreReportID= scoreReportService.addAndGetScoreReport(
                 new ScoreReport(
                         assignmentService.getAssignmentByRefer(id),
                         new Student(),

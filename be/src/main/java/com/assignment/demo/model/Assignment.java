@@ -1,11 +1,17 @@
 package com.assignment.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "assignment")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +44,16 @@ public class Assignment {
 
     @Column(name = "assignment_type")
     private String assignmentType;
+
+    public Assignment(String title, String description, LocalDateTime startTime, Integer duration, LocalDateTime endTime, Integer repeatLimit, LocalDateTime createdAt, LocalDateTime modifiedAt, String assignmentType) {
+        this.title = title;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.endTime = endTime;
+        this.repeatLimit = repeatLimit;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
+        this.assignmentType = assignmentType;
+    }
 }

@@ -1,8 +1,10 @@
 package com.assignment.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.lang.Class;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -10,6 +12,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "student")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +33,7 @@ public class Student {
             joinColumns = @JoinColumn(name = "student_id"),
             inverseJoinColumns = @JoinColumn(name = "class_id")
     )
-    private Set<Class> classes = new HashSet<>();
+    private Set<Classes> classes = new HashSet<>();
 
     @Column(name = "dob")
     private LocalDate dob;
