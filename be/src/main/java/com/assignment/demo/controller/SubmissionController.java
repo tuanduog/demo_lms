@@ -1,8 +1,11 @@
 package com.assignment.demo.controller;
 
+import com.assignment.demo.dto.AssignmentFormDetailDTO;
 import com.assignment.demo.dto.QuestionAnswerDTO;
+import com.assignment.demo.dto.QuestionDisplayDTO;
 import com.assignment.demo.model.*;
 import com.assignment.demo.service.AssignmentService;
+import com.assignment.demo.service.QuestionService;
 import com.assignment.demo.service.ScoreReportService;
 import com.assignment.demo.service.SubmissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +26,29 @@ public class SubmissionController {
     ScoreReportService scoreReportService;
     @Autowired
     AssignmentService assignmentService;
+    @Autowired
+    QuestionService questionService;
     @GetMapping
     public List<Assignment> getAllAssignment(){
         return new ArrayList<>();
     }
     @GetMapping("/{id}")
-    public Assignment getAssignmentDetail(@PathVariable int id){
-        return new Assignment();
+    public AssignmentFormDetailDTO getAssignmentDetail(@PathVariable Long id){
+        Assignment assignment= assignmentService.getOneById(id);
+        System.out.println("assignent: "+ assignment.toString());
+        List<QuestionDisplayDTO> questionList= questionService.getQuestionListByAssignment_Id(id);
+        return new AssignmentFormDetailDTO(
+                assignment.getId(),
+                assignment.getTitle(),
+                assignment.getDescription(),
+                assignment.getRepeatLimit(),
+                assignment.getAssignmentType(),
+                questionList,
+                assignment.getStartTime(),
+                assignment.getEndTime(),
+                assignment.getDuration(),
+                assignment.getCreatedAt()
+        );
     }
     @PostMapping("/{id}")
     public List<QuestionSubmission> submitAssignment(@PathVariable Long id, @RequestBody List<QuestionAnswerDTO> answerList){

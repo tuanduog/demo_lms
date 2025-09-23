@@ -28,7 +28,7 @@ public class Assignment {
     private LocalDateTime startTime;
 
     @Column(name = "duration")
-    private Integer duration; // Kiểu int hoặc long tùy thuộc vào độ lớn dữ liệu
+    private Long duration; // Kiểu int hoặc long tùy thuộc vào độ lớn dữ liệu
 
     @Column(name = "end_time")
     private LocalDateTime endTime;
@@ -45,7 +45,7 @@ public class Assignment {
     @Column(name = "assignment_type")
     private String assignmentType;
 
-    public Assignment(String title, String description, LocalDateTime startTime, Integer duration, LocalDateTime endTime, Integer repeatLimit, LocalDateTime createdAt, LocalDateTime modifiedAt, String assignmentType) {
+    public Assignment(String title, String description, LocalDateTime startTime, Long duration, LocalDateTime endTime, Integer repeatLimit, LocalDateTime createdAt, LocalDateTime modifiedAt, String assignmentType) {
         this.title = title;
         this.description = description;
         this.startTime = startTime;

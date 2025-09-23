@@ -6,7 +6,6 @@ import { SimpleLayoutType } from 'config';
 import DashboardLayout from 'layout/Dashboard';
 import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
-
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/error/500')));
@@ -19,7 +18,7 @@ const MaintenanceComingSoon2 = Loadable(lazy(() => import('pages/maintenance/com
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
 const ContactUS = Loadable(lazy(() => import('pages/contact-us')));
 const AssignmentDetail = Loadable(lazy(() => import('pages/extra-pages/AssignmentDetail')));
-
+const SubmissionPage = Loadable(lazy(() => import('pages/extra-pages/SubmissionPage')));
 // ==============================|| MAIN ROUTES ||============================== //
 
 const MainRoutes = {
@@ -36,6 +35,10 @@ const MainRoutes = {
         {
           path: 'sample-page/:id',
           element: <AssignmentDetail />
+        },
+        {
+          path: 'submission',
+          element: <SubmissionPage />
         }
       ]
     },

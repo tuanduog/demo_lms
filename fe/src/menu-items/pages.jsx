@@ -24,6 +24,13 @@ const pages = {
       icon: icons.maintenance,
       children: [
         {
+          id: 'submission-page',
+          title: 'submission-page',
+          type: 'item',
+          url: '/submission',
+          target: true
+        },
+        {
           id: 'error-404',
           title: 'error-404',
           type: 'item',

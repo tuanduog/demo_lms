@@ -18,4 +18,7 @@ public class AssignmentService {
     public List<Assignment> getAll(){
         return assignmentRepository.findAll();
     }
+    public Assignment getOneById(Long id){
+        return assignmentRepository.findById(id).orElse(null);
+    }
 }

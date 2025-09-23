@@ -11,11 +11,19 @@ const icons = {
 // ==============================|| MENU ITEMS - SAMPLE PAGE ||============================== //
 
 const samplePage = {
-  id: 'sample-page',
-  title: 'sample-page',
+  id: 'main-topics',
+  title: 'heheh',
   type: 'group',
-  url: '/sample-page',
-  icon: icons.samplePage
+  icon: icons.samplePage,
+  children: [
+    {
+      id: 'sample-page',
+      title: 'sample-page',
+      type: 'item',
+      url: '/sample-page',
+      icon: icons.samplePage,
+    }
+  ]
 };
 
 export default samplePage;
