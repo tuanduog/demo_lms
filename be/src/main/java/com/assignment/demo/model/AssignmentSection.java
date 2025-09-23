@@ -16,9 +16,9 @@ public class AssignmentSection {
     private Assignment assignment;
 
     // FK: questions_material_id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "questions_material_id")
-    private QuestionMaterial questionMaterial;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "questions_material_id")
+//    private QuestionMaterial questionMaterial;
 
     @Column(name = "name")
     private String name;
