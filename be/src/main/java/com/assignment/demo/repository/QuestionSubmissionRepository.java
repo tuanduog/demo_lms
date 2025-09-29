@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface QuestionSubmissionRepository extends JpaRepository<QuestionSubmission,Integer> {
+public interface QuestionSubmissionRepository extends JpaRepository<QuestionSubmission,Long> {
     QuestionSubmission findByScoreReport_Id(Long id);
     @Query("""
             SELECT new com.assignment.demo.dto.QuestionSubmissionDTO
-            (qs.id, as.ID, q.content, qs.studentAnswer, qs.score, qs.isCorrect) 
+            (qs.id, as.ID, q.id, q.content, qs.studentAnswer, qs.score, qs.isCorrect) 
             FROM QuestionSubmission qs 
             JOIN qs.assignmentSection as
             JOIN qs.question q

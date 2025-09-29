@@ -1,150 +1,170 @@
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { Box, Typography, Card, CardContent, TextField, Chip, Divider, LinearProgress, Button, Paper, Tabs, Tab } from '@mui/material';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, Divider, List, ListItem, ListItemText, Box, Chip, Tabs, Tab, TextField } from '@mui/material';
-import QuestionItem from '../../components/question/QuestionItem';
-const AssignmentDetail = () => {
-  const [tabValue, setTabValue] = useState(0);
-  const [assignment, setAssignment] = useState({});
-  const [manualGrading, setManualGrading] = useState({});
+import { set } from 'lodash-es';
+export default function AssignmentDetail() {
+  const [report, setReport] = useState([]);
   const { id } = useParams();
-  const { scoreReportID, studentID, title, description, assignmentType, answerList, score, review, modifiedAt, gradingStatus } = assignment;
+  const [answers, setAnswers] = useState([]);
+  const [review, setReview] = useState('');
+  const [tabValue, setTabValue] = useState(0);
 
-  const fetchAssignmentDetail = async () => {
+  // 📊 Tổng điểm toàn bài
+  const totalScore = useMemo(() => answers.reduce((sum, a) => sum + (Number(a.score) || 0), 0), [answers]);
+
+  const loadData = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/grading/${id}`);
-      setAssignment(response.data);
-      if (response.data.answerList) {
-        const initialScores = {};
-        response.data.answerList.forEach((q) => {
-          initialScores[q.questionSubmissionId] = q.score ?? '';
-        });
-        setManualGrading(initialScores);
-      }
-      console.log(response.data);
+      setReport(response.data);
+      setAnswers(response.data.answerList || []);
+      setReview(response.data.review || '');
     } catch (err) {
       console.log(err);
     }
   };
   useEffect(() => {
-    fetchAssignmentDetail();
+    loadData();
   }, []);
 
-  //   Section tab
-  function TabPanel({ children, value, index }) {
-    return (
-      <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`}>
-        {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
-      </div>
-    );
-  }
+  // 📂 Gom nhóm câu hỏi theo section
+  const groupedSections = useMemo(() => {
+    const groups = {};
+    answers.forEach((ans) => {
+      if (!groups[ans.assignmentSectionId]) groups[ans.assignmentSectionId] = [];
+      groups[ans.assignmentSectionId].push(ans);
+    });
+    return groups;
+  }, [answers]);
 
-  const groupedAnswers =
-    answerList?.reduce((acc, ans) => {
-      if (!acc[ans.assignmentSectionId]) {
-        acc[ans.assignmentSectionId] = [];
-      }
-      acc[ans.assignmentSectionId].push(ans);
-      return acc;
-    }, {}) || {};
-  console.log('group:', groupedAnswers);
-  const sectionIds = Object.keys(groupedAnswers);
-  //   ----------------
+  const sectionIds = Object.keys(groupedSections).sort((a, b) => a - b);
 
-  const handleChangeScore = (event, questionId) => {
-    const newScore = event;
-    setManualGrading((prev) => ({
-      ...prev,
-      [questionId]: newScore
-    }));
+  // ✏️ Nhập điểm cho câu tự luận
+  const handleScoreChange = (id, value) => {
+    setAnswers((prev) => prev.map((a) => (a.questionSubmissionId === id ? { ...a, score: Number(value) || 0 } : a)));
   };
+
+  // 📤 Gửi kết quả về backend
+  const handleSubmitGrades = async () => {
+    console.log(
+      'Submitting grades:',
+      answers.map((a) => ({ questionSubmissionId: a.questionSubmissionId, score: Number(a.score) || 0 }))
+    );
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/grading/${id}`,
+        {
+          scoreList: answers.map((a) => ({ questionSubmissionId: a.questionSubmissionId, score: Number(a.score) || 0 })),
+          review: review || ''
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+
+      console.log('Grading response:', response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
-    <>
-      <Box p={3}>
-        {/* Thông tin Assignment */}
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>
-              {title}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" gutterBottom>
-              {description}
-            </Typography>
+    <Box p={4} bgcolor="#f5f6fa" minHeight="100vh">
+      {/* 🧾 Thông tin bài */}
+      <Typography variant="h4" gutterBottom>
+        📊 Chấm điểm: {report.title}
+      </Typography>
+      <Typography variant="subtitle1" gutterBottom>
+        👤 SV ID: {report.studentID} | 📘 Lớp: {report.className}
+      </Typography>
 
-            <Grid container spacing={2} mt={1}>
-              <Grid item xs={6}>
-                <Typography variant="subtitle2">Assignment Type:</Typography>
-                <Typography>{assignmentType}</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="subtitle2">Grading Status:</Typography>
-                <Chip label={gradingStatus} color={gradingStatus === 'completed' ? 'success' : 'warning'} />
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="subtitle2">Score:</Typography>
-                <Typography>{score ?? 'Chưa chấm'}</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="subtitle2">Modified At:</Typography>
-                <Typography>{new Date(modifiedAt).toLocaleString('vi-VN')}</Typography>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-
-        {/* Review */}
-        {review && (
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6">Giáo viên nhận xét</Typography>
-              <Typography variant="body1">{review}</Typography>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Tabs cho từng Section */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Câu hỏi & Câu trả lời
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-
-            {sectionIds.length > 0 ? (
-              <>
-                <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} variant="scrollable" scrollButtons="auto">
-                  {sectionIds.map((sid, idx) => (
-                    <Tab key={sid} label={`Section ${sid}`} />
-                  ))}
-                </Tabs>
-
-                {sectionIds.map((sid, idx) => (
-                  <TabPanel key={sid} value={tabValue} index={idx}>
-                    <List>
-                      {groupedAnswers[sid].map((q, index) => {
-                        const scoreValue = manualGrading[q.questionSubmissionId] ?? '';
-                        console.log('score:', scoreValue);
-                        return (
-                          <QuestionItem
-                            question={q}
-                            scoreValue={scoreValue}
-                            onScoreChange={handleChangeScore}
-                            gradingStatus={gradingStatus}
-                            index={index}
-                          />
-                        );
-                      })}
-                    </List>
-                  </TabPanel>
-                ))}
-              </>
-            ) : (
-              <Typography>Không có câu trả lời nào.</Typography>
-            )}
-          </CardContent>
-        </Card>
+      {/* 📊 Thanh điểm tổng */}
+      <Box width="60%" mb={4}>
+        <LinearProgress variant="determinate" value={(totalScore / 100) * 100} sx={{ height: 14, borderRadius: 6 }} />
+        <Typography variant="body1" mt={1}>
+          Tổng điểm hiện tại: <b>{totalScore.toFixed(2)}</b> / 100
+        </Typography>
       </Box>
-    </>
+
+      <Divider sx={{ my: 3 }} />
+
+      {/* 🧠 Tabs các section */}
+      {sectionIds.length > 0 && (
+        <>
+          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} variant="scrollable" scrollButtons="auto" sx={{ mb: 3 }}>
+            {sectionIds.map((sid, index) => (
+              <Tab key={sid} label={`📚 Phần ${sid}`} />
+            ))}
+          </Tabs>
+
+          {/* Nội dung từng tab */}
+          {sectionIds.map((sid, index) => {
+            if (tabValue !== index) return null;
+            const sectionQuestions = groupedSections[sid];
+            const sectionScore = sectionQuestions.reduce((s, q) => s + (Number(q.score) || 0), 0);
+
+            return (
+              <Box key={sid}>
+                <Typography variant="h5" gutterBottom>
+                  📚 Phần {sid} – Tổng điểm: <b>{sectionScore.toFixed(2)}</b>
+                </Typography>
+
+                {sectionQuestions.map((ans) => (
+                  <Card key={ans.questionSubmissionId} sx={{ mb: 2, boxShadow: 2 }}>
+                    <CardContent>
+                      <Typography variant="h6">
+                        Câu {ans.questionId}: {ans.questionContent}
+                      </Typography>
+
+                      <Typography variant="body2" color="text.secondary" mt={1}>
+                        📝 Trả lời: {ans.studentAnswer}
+                      </Typography>
+
+                      {ans.isCorrect !== null ? (
+                        <Box mt={2} display="flex" alignItems="center" gap={2}>
+                          <Chip label={ans.isCorrect ? '✅ Đúng' : '❌ Sai'} color={ans.isCorrect ? 'success' : 'error'} />
+                          <Typography>
+                            Điểm: <b>{ans.score}</b>
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Box mt={2}>
+                          <TextField
+                            label="Nhập điểm"
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            value={ans.score}
+                            onChange={(e) => handleScoreChange(ans.questionSubmissionId, e.target.value)}
+                            sx={{ width: 200 }}
+                          />
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </Box>
+            );
+          })}
+        </>
+      )}
+
+      <Paper elevation={2} sx={{ p: 3, mt: 5, border: '4px solid lightgreen' }}>
+        <Typography variant="h6" gutterBottom>
+          ✍️ Nhận xét bài làm
+        </Typography>
+        <TextField
+          fullWidth
+          multiline
+          minRows={3}
+          placeholder="Nhập nhận xét..."
+          value={review}
+          onChange={(e) => setReview(e.target.value)}
+        />
+        <Box mt={4}>
+          <Button variant="contained" size="large" onClick={() => handleSubmitGrades()}>
+            ✅ Hoàn tất chấm điểm
+          </Button>
+        </Box>
+      </Paper>
+    </Box>
   );
-};
-export default AssignmentDetail;
+}

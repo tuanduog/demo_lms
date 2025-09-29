@@ -19,6 +19,9 @@ const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')))
 const ContactUS = Loadable(lazy(() => import('pages/contact-us')));
 const AssignmentDetail = Loadable(lazy(() => import('pages/extra-pages/AssignmentDetail')));
 const SubmissionPage = Loadable(lazy(() => import('pages/extra-pages/SubmissionPage')));
+const AssignmentPage = Loadable(lazy(() => import('pages/extra-pages/AssignmentPage')));
+const SkillRadar = Loadable(lazy(() => import('pages/extra-pages/SkillRadar')));
+const FlashcardPage = Loadable(lazy(() => import('pages/extra-pages/FlashcardPage')));
 // ==============================|| MAIN ROUTES ||============================== //
 
 const MainRoutes = {
@@ -37,8 +40,20 @@ const MainRoutes = {
           element: <AssignmentDetail />
         },
         {
-          path: 'submission',
+          path: 'submission/:id',
           element: <SubmissionPage />
+        },
+        {
+          path: 'assignment',
+          element: <AssignmentPage />
+        },
+        {
+          path: 'skill-radar',
+          element: <SkillRadar />
+        },
+        {
+          path: 'flashcard',
+          element: <FlashcardPage />
         }
       ]
     },

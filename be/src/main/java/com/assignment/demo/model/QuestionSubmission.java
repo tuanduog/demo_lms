@@ -40,12 +40,16 @@ public class QuestionSubmission {
     @Column(name = "is_correct")
     private Boolean isCorrect;
 
-    public QuestionSubmission(ScoreReport scoreReport, AssignmentSection assignmentSection, Question question, String studentAnswer, Double score, Boolean isCorrect) {
+    @Column(name = "question_review")
+    private String questionReview;
+
+    public QuestionSubmission(ScoreReport scoreReport, AssignmentSection assignmentSection, Question question, String studentAnswer, Double score, Boolean isCorrect, String questionReview) {
         this.scoreReport = scoreReport;
         this.assignmentSection = assignmentSection;
         this.question = question;
         this.studentAnswer = studentAnswer;
         this.score = score;
         this.isCorrect = isCorrect;
+        this.questionReview = questionReview;
     }
 }

@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GradingDTO {
-    private List<QuestionScoreDTO> scoreList;
-    private String review;
+
+public class FlashcardDetailDTO {
+    private Long flashcardId;
+    private String key;
+    private String value;
 }

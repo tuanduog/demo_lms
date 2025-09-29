@@ -1,5 +1,6 @@
 package com.assignment.demo.service;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import com.assignment.demo.dto.AssignmentBasicDTO;
 import com.assignment.demo.dto.AssignmentDetailDTO;
 import com.assignment.demo.model.ScoreReport;
@@ -11,6 +12,7 @@ import com.assignment.demo.repository.ScoreVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -35,8 +37,12 @@ public class ScoreReportService {
        return scoreReportRepository.getReferenceById(id);
     }
     public AssignmentDetailDTO getGradingAssignment(long scoreReportID){
-        AssignmentDetailDTO assignment= scoreReportRepository.findAssignmentDetail(scoreReportID);
-        assignment.setAnswerList(questionSubmissionRepository.findAllByScoreReport_Id(scoreReportID));
+
+        AssignmentDetailDTO assignment= scoreReportRepository.findAssignmentDetail(scoreReportID, PageRequest.of(0,1)).stream().findFirst().orElse(null);
+        if(assignment!=null){
+            assignment.setAnswerList(questionSubmissionRepository.findAllByScoreReport_Id(scoreReportID));
+        }
+
         return assignment;
     }
     public List<AssignmentBasicDTO> getAllGradingAssignment(){

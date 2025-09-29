@@ -13,6 +13,7 @@ import java.util.List;
 public class AssignmentDetailDTO {
     private long scoreReportID;
     private long studentID;
+    private String className;
     private String title;
     private String description;
     private String assignmentType;
@@ -22,9 +23,10 @@ public class AssignmentDetailDTO {
     private LocalDateTime modifiedAt;
     private String gradingStatus;
 
-    public AssignmentDetailDTO(long scoreReportID, long studentID, String title, String description, String assignmentType, Double score, String review, LocalDateTime modifiedAt, String gradingStatus) {
+    public AssignmentDetailDTO(long scoreReportID, long studentID, String className, String title, String description, String assignmentType, Double score, String review, LocalDateTime modifiedAt, String gradingStatus) {
         this.scoreReportID = scoreReportID;
         this.studentID = studentID;
+        this.className= className;
         this.title = title;
         this.description = description;
         this.assignmentType = assignmentType;

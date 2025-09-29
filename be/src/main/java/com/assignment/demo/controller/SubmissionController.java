@@ -1,9 +1,11 @@
 package com.assignment.demo.controller;
 
+import com.assignment.demo.dto.AssignmentFormBasicDTO;
 import com.assignment.demo.dto.AssignmentFormDetailDTO;
 import com.assignment.demo.dto.QuestionAnswerDTO;
 import com.assignment.demo.dto.QuestionDisplayDTO;
 import com.assignment.demo.model.*;
+import com.assignment.demo.repository.AssignmentRepository;
 import com.assignment.demo.service.AssignmentService;
 import com.assignment.demo.service.QuestionService;
 import com.assignment.demo.service.ScoreReportService;
@@ -30,12 +32,11 @@ public class SubmissionController {
     QuestionService questionService;
     @GetMapping
     public List<Assignment> getAllAssignment(){
-        return new ArrayList<>();
+        return assignmentService.getAll();
     }
     @GetMapping("/{id}")
     public AssignmentFormDetailDTO getAssignmentDetail(@PathVariable Long id){
         Assignment assignment= assignmentService.getOneById(id);
-        System.out.println("assignent: "+ assignment.toString());
         List<QuestionDisplayDTO> questionList= questionService.getQuestionListByAssignment_Id(id);
         return new AssignmentFormDetailDTO(
                 assignment.getId(),
@@ -51,7 +52,7 @@ public class SubmissionController {
         );
     }
     @PostMapping("/{id}")
-    public List<QuestionSubmission> submitAssignment(@PathVariable Long id, @RequestBody List<QuestionAnswerDTO> answerList){
+    public String submitAssignment(@PathVariable Long id, @RequestBody List<QuestionAnswerDTO> answerList){
         Long scoreReportID= scoreReportService.addAndGetScoreReport(
                 new ScoreReport(
                         assignmentService.getAssignmentByRefer(id),
@@ -69,7 +70,7 @@ public class SubmissionController {
                 )
         );
         submissionService.submitAnswer(id,scoreReportID,answerList);
-        return new ArrayList<>();
+        return "Completed";
     }
 
 }

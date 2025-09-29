@@ -56,7 +56,8 @@ public class SubmissionService {
                             questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
                             answer.getStudentAnswer(),
                             null,
-                            answer.getStudentAnswer().equalsIgnoreCase(answerMap.get(answer.getQuestionID()).getAnswerContent())
+                            answer.getStudentAnswer().equalsIgnoreCase(answerMap.get(answer.getQuestionID()).getAnswerContent()),
+                            null
                     ));
                 }
             }
@@ -76,7 +77,8 @@ public class SubmissionService {
                         questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
                         answer.getStudentAnswer(),
                         null,
-                        null
+                        null,
+                        "hehe"
                 ));
             }
         }

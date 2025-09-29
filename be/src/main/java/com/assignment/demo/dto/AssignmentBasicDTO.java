@@ -13,6 +13,7 @@ import java.util.List;
 public class AssignmentBasicDTO {
     private long scoreReportID;
     private long studentID;
+    private String className;
     private String title;
     private String assignmentType;
     private Double score;

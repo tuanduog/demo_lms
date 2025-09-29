@@ -24,11 +24,11 @@ const pages = {
       icon: icons.maintenance,
       children: [
         {
-          id: 'submission-page',
-          title: 'submission-page',
+          id: 'radar-chart',
+          title: 'skill-radar',
           type: 'item',
-          url: '/submission',
-          target: true
+          url: '/skill-radar',
+          target: false
         },
         {
           id: 'error-404',

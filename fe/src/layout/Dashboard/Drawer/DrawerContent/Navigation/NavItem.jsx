@@ -31,6 +31,8 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
   const { menuOrientation } = useConfig();
 
+  //_self: navigate khong reload trang
+  //_blank: navigate va reload trang
   let itemTarget = '_self';
   if (item.target) {
     itemTarget = '_blank';
