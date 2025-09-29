@@ -1,9 +1,15 @@
 package com.assignment.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "assignment_section")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AssignmentSection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,15 +21,9 @@ public class AssignmentSection {
     @JoinColumn(name = "assignments_id")
     private Assignment assignment;
 
-    // FK: questions_material_id
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "questions_material_id")
-//    private QuestionMaterial questionMaterial;
-
     @Column(name = "name")
     private String name;
 
-    @Column(name = "question_type")
-    private String questionType;
-
+//    @Column(name = "type")
+//    private String type;
 }

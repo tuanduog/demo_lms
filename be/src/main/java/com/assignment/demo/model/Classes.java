@@ -14,9 +14,6 @@ public class Classes {
     @Column(name = "class_id")
     private Long id;
 
-    @ManyToMany(mappedBy = "classes")
-    private Set<Student> students = new HashSet<>();
-
     @Column(name = "class_code", unique = true, nullable = false)
     private String classCode;
 

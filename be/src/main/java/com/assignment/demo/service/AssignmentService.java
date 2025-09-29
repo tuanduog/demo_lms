@@ -20,4 +20,8 @@ public class AssignmentService {
         newAssignment.setEndTime(assignment.getDeadline());
         return assignmentRepository.save(newAssignment);
     }
+
+    public Assignment getOneToTest(Long id){
+        return assignmentRepository.findById(id).get();
+    }
 }

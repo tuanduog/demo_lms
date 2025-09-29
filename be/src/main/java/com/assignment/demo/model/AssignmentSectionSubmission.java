@@ -1,11 +1,17 @@
 package com.assignment.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "assignment_section_subission")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AssignmentSectionSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

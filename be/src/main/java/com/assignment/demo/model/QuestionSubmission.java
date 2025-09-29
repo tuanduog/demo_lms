@@ -1,13 +1,19 @@
 package com.assignment.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "question_submission")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class QuestionSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "questions_submission_id")
+    @Column(name = "question_submission_id")
     private Long ID;
 
 
@@ -16,13 +22,13 @@ public class QuestionSubmission {
     private ScoreReport scoreReport;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignments_section_submission_id")
-    private AssignmentSectionSubmission assignmentSectionSubmission;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "assignments_section_id")
+//    private AssignmentSection assignmentSection;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "questions_id")
+    @JoinColumn(name = "question_id")
     private Question question;
 
     @Column(name = "student_answer")
@@ -31,7 +37,10 @@ public class QuestionSubmission {
     @Column(name = "score")
     private Double score;
 
-    @Column(name = "is_correct")
-    private Boolean isCorrect;
+    @Column(name = "correct_ans")
+    private String correctAnswer;
+
+    @Column(name = "explaination")
+    private String explaination;
 
 }

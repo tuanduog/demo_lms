@@ -2,6 +2,7 @@ package com.assignment.demo.controller;
 
 import com.assignment.demo.model.*;
 import com.assignment.demo.repository.*;
+import com.assignment.demo.service.AssignmentService;
 import com.assignment.demo.service.QuestionService;
 import com.assignment.demo.utils.CellHelper;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/question")
@@ -44,8 +43,14 @@ public class QuestionController {
     @Autowired
     private QuestionService  questionService;
 
-    @PostMapping("/add-question")
-    public ResponseEntity<?> addQuestion(@RequestParam("file") MultipartFile file) throws IOException {
+    @Autowired
+    private AssignmentService assignmentService;
+
+    @Autowired
+    private AssignmentSectionRepository  assignmentSectionRepository;
+
+    @PostMapping("/add-question/{id}")
+    public ResponseEntity<?> addQuestion(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
@@ -62,120 +67,125 @@ public class QuestionController {
             columnIndexMap.put(cell.getStringCellValue().trim(), cell.getColumnIndex());
         }
 
+        Integer sectionIndex = columnIndexMap.get("Section");
         Integer materialIndex = columnIndexMap.get("Material");
         Integer urlIndex = columnIndexMap.get("Main_content");
         Integer numberOfQuestionIndex = columnIndexMap.get("Number_of_question");
         Integer questionTypeIndex = columnIndexMap.get("Question_type");
+        Integer numberOfPartIndex = columnIndexMap.get("Number_of_part");
 
-        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-            Row row = sheet.getRow(i);
-            if (row == null) continue;
-
-            // check section, type, question_type
-            // Cell sectionCell = row.getCell(sectionIndex);
-            // String sectionValue = sectionCell.getStringCellValue();
-            // if(sectionValue != null && !sectionValue.isEmpty()){
-            //continue;
-            // }
-
-            String materialValue = cellHelper.getCellValue(row.getCell(materialIndex));
-            QuestionMaterial questionMaterial = null;
-            if (materialValue != null && !materialValue.isEmpty()) {
-                questionMaterial = new QuestionMaterial();
-                questionMaterial.setType(materialValue);
-                questionMaterial.setUrl(cellHelper.getCellValue(row.getCell(urlIndex)));
-                questionMaterial.setQuantity(safeParseInt(cellHelper.getCellValue(row.getCell(numberOfQuestionIndex)), 0));
-
-                questionMaterialRepository.save(questionMaterial);
+        int rowIndex = 1;
+        while (rowIndex <= sheet.getLastRowNum()) {
+            Row row = sheet.getRow(rowIndex);
+            if (row == null) {
+                rowIndex++;
+                continue;
             }
 
-            int count = safeParseInt(cellHelper.getCellValue(row.getCell(numberOfQuestionIndex)), 1);
-            int j = i + count - 1;
-            String questionTypeValue = cellHelper.getCellValue(row.getCell(questionTypeIndex));
+            // ====== Tạo Section ======
+            String sectionValue = cellHelper.getCellValue(row.getCell(sectionIndex));
+            if (sectionValue == null || sectionValue.isEmpty()) {
+                rowIndex++;
+                continue;
+            }
 
-            if (questionTypeValue != null && !questionTypeValue.isEmpty()) {
-                if ("MCQ".equalsIgnoreCase(questionTypeValue) || "Ordering".equalsIgnoreCase(questionTypeValue)) {
-                    for (int t = i; t <= j; t++) {
-                        Row questionRow = sheet.getRow(t);
-                        if (questionRow == null) continue;
+            int numberOfPart = safeParseInt(cellHelper.getCellValue(row.getCell(numberOfPartIndex)), 1);
+            AssignmentSection assignmentSection = new AssignmentSection();
+            assignmentSection.setName(sectionValue);
+            assignmentSection.setAssignment(assignmentService.getOneToTest(id)); // fake assignment test
+            assignmentSectionRepository.save(assignmentSection);
 
-                        Question q = new Question();
-                        if (questionMaterial != null) {
-                            q.setQuestionMaterial(questionMaterial);
-                        }
-                        q.setType(questionTypeValue);
-                        q.setExplaination(cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Explain"))));
-                        q.setScore(safeParseDouble(cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Score"))), 0.0));
-                        q.setQuestionContent(cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Question_content"))));
-                        questionRepository.save(q);
+            // ====== Xử lý Materials trong section ======
+            int sectionEnd = rowIndex + numberOfPart - 1;
+            for (int v = rowIndex; v <= sectionEnd; v++) { // 7-10
+                Row materialRow = sheet.getRow(v);
+                if (materialRow == null) continue;
 
+                String materialValue = cellHelper.getCellValue(materialRow.getCell(materialIndex));
+                QuestionMaterial questionMaterial = new QuestionMaterial();
+                questionMaterial.setType(materialValue);
+                questionMaterial.setUrl(cellHelper.getCellValue(materialRow.getCell(urlIndex)));
+                questionMaterial.setQuantity(safeParseInt(cellHelper.getCellValue(materialRow.getCell(numberOfQuestionIndex)), 0));
+                questionMaterial.setAssignmentSection(assignmentSection);
+                questionMaterialRepository.save(questionMaterial);
+
+                // ====== Xử lý Questions trong material ======
+                int count = safeParseInt(cellHelper.getCellValue(materialRow.getCell(numberOfQuestionIndex)), 1);
+                int materialEnd = v + count - 1;
+                sectionEnd += count - 1;
+                String questionTypeValue = cellHelper.getCellValue(materialRow.getCell(questionTypeIndex));
+                for (int t = v; t <= materialEnd; t++) {
+                    Row questionRow = sheet.getRow(t);
+                    if (questionRow == null) continue;
+
+//                    String questionTypeValue = cellHelper.getCellValue(questionRow.getCell(questionTypeIndex));
+//                    if (questionTypeValue == null || questionTypeValue.isEmpty()) continue;
+
+                    Question q = new Question();
+                    q.setQuestionMaterial(questionMaterial);
+                    q.setType(questionTypeValue);
+                    q.setExplaination(cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Explain"))));
+                    q.setScore(safeParseDouble(cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Score"))), 0.0));
+                    q.setQuestionContent(cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Question_content"))));
+                    questionRepository.save(q);
+
+                    // Xử lý theo loại câu hỏi
+                    if ("MCQ".equalsIgnoreCase(questionTypeValue)) {
                         String[] options = {
                                 cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Option_A"))),
                                 cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Option_B"))),
                                 cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Option_C"))),
                                 cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Option_D")))
                         };
-
                         String correct = cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Correct_answer")));
-
+                        List<String> ansList = new ArrayList<>(Arrays.asList(correct.split(",")));
                         for (String opt : options) {
                             if (opt == null || opt.isEmpty()) continue;
                             MCQAnswer ans = new MCQAnswer();
                             ans.setQuestion(q);
                             ans.setAnswerContent(opt);
-                            ans.setCorrect(opt.equalsIgnoreCase(correct));
+                            Iterator<String> it = ansList.iterator();
+                            while (it.hasNext()) {
+                                String a = it.next();
+                                if (a.trim().equalsIgnoreCase(opt)) {
+                                    ans.setCorrect(true);
+                                    it.remove();
+                                    break;
+                                }
+                            }
                             mcqAnswerRepository.save(ans);
-                        } // chua can thiet -> de fix sau
-                    }
-                    i = j;
-                }
-
-                else if ("FillBlank".equalsIgnoreCase(questionTypeValue)) {
-                    Question q = new Question();
-                    if (questionMaterial != null) {
-                        q.setQuestionMaterial(questionMaterial);
-                    }
-                    q.setType(questionTypeValue);
-                    q.setExplaination(cellHelper.getCellValue(row.getCell(columnIndexMap.get("Explain"))));
-                    q.setScore(safeParseDouble(cellHelper.getCellValue(row.getCell(columnIndexMap.get("Score"))), 0.0));
-                    q.setQuestionContent(cellHelper.getCellValue(row.getCell(columnIndexMap.get("Question_content"))));
-                    questionRepository.save(q);
-
-                    String correct = cellHelper.getCellValue(row.getCell(columnIndexMap.get("Correct_answer")));
-                    if (correct != null && !correct.isEmpty()) {
-                        String[] ansList = correct.split(",");
-                        int slotIndex = 0;
-                        for (String a : ansList) {
-                            BlankQuestion blankQ = new BlankQuestion();
-                            blankQ.setQuestion(q);
-                            blankQ.setBlankSlot(slotIndex);
-                            blankQuestionRepository.save(blankQ);
-
-                            BlankAnswer blankAns = new BlankAnswer();
-                            blankAns.setBlankQuestion(blankQ);
-                            blankAns.setAnswerContent(a.trim());
-                            blankAnswerRepository.save(blankAns);
-
-                            slotIndex++;
                         }
                     }
-                }
+                    else if ("FillBlank".equalsIgnoreCase(questionTypeValue)) {
+                        String correct = cellHelper.getCellValue(questionRow.getCell(columnIndexMap.get("Correct_answer")));
+                        if (correct != null && !correct.isEmpty()) {
+                            String[] ansList = correct.split(",");
+                            long slotIndex = 1;
+                            for (String a : ansList) {
+                                BlankQuestion blankQ = new BlankQuestion();
+                                blankQ.setQuestion(q);
+                                blankQ.setBlankSlot(slotIndex);
+                                blankQuestionRepository.save(blankQ);
 
-                else if ("Essay".equalsIgnoreCase(questionTypeValue)) {
-                    Question q = new Question();
-                    if (questionMaterial != null) {
-                        q.setQuestionMaterial(questionMaterial);
+                                BlankAnswer blankAns = new BlankAnswer();
+                                blankAns.setBlankQuestion(blankQ);
+                                blankAns.setAnswerContent(a.trim());
+                                blankAnswerRepository.save(blankAns);
+                                slotIndex++;
+                            }
+                        }
                     }
-                    q.setType(questionTypeValue);
-                    q.setExplaination(cellHelper.getCellValue(row.getCell(columnIndexMap.get("Explain"))));
-                    q.setScore(safeParseDouble(cellHelper.getCellValue(row.getCell(columnIndexMap.get("Score"))), 0.0));
-                    q.setQuestionContent(cellHelper.getCellValue(row.getCell(columnIndexMap.get("Question_content"))));
-                    questionRepository.save(q);
+                    // Essay thì chỉ lưu question
                 }
+                v = materialEnd;
             }
+
+            rowIndex = sectionEnd + 1; // sang section mới
         }
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok("Import success");
     }
+
 
     private int safeParseInt(String value, int defaultVal) {
         try {
@@ -195,8 +205,14 @@ public class QuestionController {
         return defaultVal;
     }
 
-    @GetMapping("/get-all-question")
-    public ResponseEntity<?> getAllQuestion() {
-        return ResponseEntity.ok(questionService.getQuestionStruct());
+    @GetMapping("/get-all-question/{asignId}")
+    public ResponseEntity<?> getAllQuestion(@PathVariable Long asignId) {
+        return ResponseEntity.ok(questionService.getQuestionStruct(asignId));
+    }
+
+    @GetMapping("/check-type/{asignId}")
+    public ResponseEntity<?> checkType(@PathVariable Long asignId) {
+        boolean check = questionService.checkType(asignId);
+        return ResponseEntity.ok(check);
     }
 }

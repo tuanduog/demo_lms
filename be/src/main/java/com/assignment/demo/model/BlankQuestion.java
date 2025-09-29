@@ -23,7 +23,7 @@ public class BlankQuestion {
     private Question question;
 
     @Column(name = "blank_slot")
-    private Integer blankSlot;
+    private Long blankSlot;
 
     @OneToMany(mappedBy = "blankQuestion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<BlankAnswer> blankAnswers;

@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class BlankQuestionDTO {
     private Long id;
-    private Integer blankSlot;
+    private Long blankSlot;
     List<BlankAnswerDTO> blankAnswers;
 }

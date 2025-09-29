@@ -21,6 +21,10 @@ public class QuestionMaterial {
     @OneToMany(mappedBy = "questionMaterial", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignments_section_id")
+    private AssignmentSection assignmentSection;
+
     @Column(name = "url", columnDefinition = "TEXT")
     private String url;
     @Column(name = "type")

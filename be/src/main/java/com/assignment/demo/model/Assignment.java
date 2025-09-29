@@ -18,12 +18,9 @@ public class Assignment {
     @Column(name = "assignments_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
-    private Course course;
-
-    @Column(name = "assignment_value")
-    private Integer assignment_value;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "course_id")
+//    private Course course;
 
     @Column(name = "title")
     private String title;

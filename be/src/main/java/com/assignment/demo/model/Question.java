@@ -24,9 +24,9 @@ public class Question {
     @JoinColumn(name = "question_material_id")
     private QuestionMaterial questionMaterial;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignments_section_id")
-    private AssignmentSection assignmentSection;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "assignments_section_id")
+//    private AssignmentSection assignmentSection;
 
     @Column(name = "question_content", columnDefinition = "TEXT")
     private String questionContent;
