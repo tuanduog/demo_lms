@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Card, CardContent, TextField, Chip, Divider, LinearProgress, Button, Paper, Tabs, Tab } from '@mui/material';
 import axios from 'axios';
 import { set } from 'lodash-es';
@@ -12,7 +13,7 @@ export default function AssignmentDetail() {
 
   // 📊 Tổng điểm toàn bài
   const totalScore = useMemo(() => answers.reduce((sum, a) => sum + (Number(a.score) || 0), 0), [answers]);
-
+  const navigate = useNavigate();
   const loadData = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/grading/${id}`);
@@ -64,6 +65,7 @@ export default function AssignmentDetail() {
     } catch (err) {
       console.log(err);
     }
+    navigate('/sample-page');
   };
 
   return (
@@ -91,7 +93,7 @@ export default function AssignmentDetail() {
         <>
           <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} variant="scrollable" scrollButtons="auto" sx={{ mb: 3 }}>
             {sectionIds.map((sid, index) => (
-              <Tab key={sid} label={`📚 Phần ${sid}`} />
+              <Tab key={sid} label={`📚 Phần ${index + 1}`} />
             ))}
           </Tabs>
 
@@ -104,7 +106,7 @@ export default function AssignmentDetail() {
             return (
               <Box key={sid}>
                 <Typography variant="h5" gutterBottom>
-                  📚 Phần {sid} – Tổng điểm: <b>{sectionScore.toFixed(2)}</b>
+                  📚 Phần {index + 1} – Tổng điểm: <b>{sectionScore.toFixed(2)}</b>
                 </Typography>
 
                 {sectionQuestions.map((ans) => (

@@ -21,4 +21,5 @@ public interface QuestionRepository extends JpaRepository<Question,Integer> {
             
             """)
     public List<QuestionDisplayDTO> findAllByAssignment_Id(Long id);
+
 }

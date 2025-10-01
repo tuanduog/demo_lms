@@ -28,7 +28,7 @@ const SubmissionPage = () => {
   const [assignment, setAssignment] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const [timeLeft, setTimeLeft] = useState(null);
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState({});
   const loadData = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/test/${id}`);
@@ -114,22 +114,35 @@ const SubmissionPage = () => {
     return `${m} phút ${s < 10 ? '0' + s : s} giây`;
   };
 
-  const handleAnswerChange = (questionId, value) => {
-    setAnswers((prev) => {
-      const existingIndex = prev.findIndex((ans) => ans.questionId === questionId);
-      if (existingIndex !== -1) {
-        const updated = [...prev];
-        updated[existingIndex].answer = value;
-        return updated;
-      } else {
-        return [...prev, { questionId, answer: value }];
+  const handleAnswerChange = (questionId, field, value) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: {
+        ...prev[questionId],
+        [field]: value
       }
-    });
+    }));
   };
 
-  const handleSubmit = () => {
-    console.log('📤 Nộp bài với đáp án:', answers);
-    alert('Bài đã được nộp!');
+  const handleSubmit = async () => {
+    const formatted = Object.entries(answers).map(([questionId, ans]) => {
+      const q = assignment.questionList.find((q) => q.questionId === Number(questionId));
+      return {
+        questionID: Number(questionId),
+        sectionID: q?.assignmentSectionId || null,
+        studentAnswer: ans.choice || ans.text || '',
+        file: ans.file || null
+      };
+    });
+    console.log('📤 Nộp bài với đáp án:', formatted);
+    try {
+      const response = await axios.post(`http://localhost:8080/test/${id}`, formatted, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      alert(response.data || 'thanh cong');
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   if (!assignment) return <Typography>Đang tải...</Typography>;
@@ -233,12 +246,14 @@ const SubmissionPage = () => {
                     <Typography variant="h6" mb={1}>
                       Câu {q.questionId}: {q.questionContent}
                     </Typography>
-
                     {/* 🧠 Input theo loại câu hỏi */}
                     {q.questionType === 'mcq' && (
-                      <RadioGroup value={answers[q.questionId] || ''} onChange={(e) => handleAnswerChange(q.questionId, e.target.value)}>
+                      <RadioGroup
+                        value={answers[q.questionId]?.choice || ''}
+                        onChange={(e) => handleAnswerChange(q.questionId, 'choice', e.target.value)}
+                      >
                         {q.answerList?.map((ans, i) => (
-                          <FormControlLabel key={i} value={ans} control={<Radio />} label={ans} />
+                          <FormControlLabel key={i} value={ans.answerContent} control={<Radio />} label={ans.answerContent} />
                         ))}
                       </RadioGroup>
                     )}
@@ -250,41 +265,27 @@ const SubmissionPage = () => {
                           multiline
                           rows={4}
                           placeholder="Nhập câu trả lời..."
-                          // value={answers[q.questionId]?.text || ''}
-                          onChange={(e) =>
-                            handleAnswerChange(q.questionId, {
-                              ...answers[q.questionId],
-                              text: e.target.value
-                            })
-                          }
+                          value={answers[q.questionId]?.text || ''}
+                          onChange={(e) => handleAnswerChange(q.questionId, 'text', e.target.value)}
                         />
 
                         <Button variant="outlined" component="label">
                           📤 Tải file câu trả lời (tuỳ chọn)
-                          <input
-                            hidden
-                            type="file"
-                            onChange={(e) =>
-                              handleAnswerChange(q.questionId, {
-                                ...answers[q.questionId],
-                                file: e.target.files[0] || null
-                              })
-                            }
-                          />
+                          <input hidden type="file" onChange={(e) => handleAnswerChange(q.questionId, 'file', e.target.files[0] || null)} />
                         </Button>
 
-                        {answers[q.questionId]?.file && (
+                        {/* {answers[q.questionId]?.file && (
                           <Typography variant="body2" color="text.secondary">
                             📎 Đã chọn: {answers[q.questionId].file.name}
                           </Typography>
-                        )}
+                        )} */}
                       </Box>
                     )}
 
                     {q.questionType === 'lab' && (
                       <Button variant="outlined" component="label">
                         📤 Tải file kết quả
-                        <input hidden type="file" onChange={(e) => handleAnswerChange(q.questionId, e.target.files[0]?.name || '')} />
+                        <input hidden type="file" onChange={(e) => handleAnswerChange(q.questionId, 'file', e.target.files[0] || null)} />
                       </Button>
                     )}
 
@@ -292,8 +293,8 @@ const SubmissionPage = () => {
                       <TextField
                         fullWidth
                         placeholder="Nhập đáp án quiz..."
-                        value={answers[q.questionId] || ''}
-                        onChange={(e) => handleAnswerChange(q.questionId, e.target.value)}
+                        value={answers[q.questionId]?.choice || ''}
+                        onChange={(e) => handleAnswerChange(q.questionId, 'choice', e.target.value)}
                       />
                     )}
                   </Box>

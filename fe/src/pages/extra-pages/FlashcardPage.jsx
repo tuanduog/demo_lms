@@ -1,13 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, Typography, Button, Box, LinearProgress } from '@mui/material';
 import { motion } from 'framer-motion';
-
-const FlashcardPage = ({ data }) => {
+import axios from 'axios';
+const FlashcardPage = () => {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [data, setData] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [current, setCurrent] = useState({});
 
-  const total = data.length;
-  const current = data[index];
+  const loadData = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/flashcard/1');
+      setData(response.data);
+      setTotal(response.data.length);
+      // setCurrent(response.data[0] || {});
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleFlip = useCallback(() => {
     setFlipped((prev) => !prev);
@@ -79,69 +94,73 @@ const FlashcardPage = ({ data }) => {
             transformStyle: 'preserve-3d'
           }}
         >
-          <Card
-            sx={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              backfaceVisibility: 'hidden',
-              boxShadow: 4,
-              borderRadius: 4
-            }}
-          >
-            <CardContent>
-              <Typography
-                variant="h5"
-                align="center"
+          {data.length > 0 && (
+            <>
+              <Card
                 sx={{
-                  mt: 6,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '200%'
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  backfaceVisibility: 'hidden',
+                  boxShadow: 4,
+                  borderRadius: 4
                 }}
               >
-                {current.key}
-              </Typography>
-            </CardContent>
-          </Card>
+                <CardContent>
+                  <Typography
+                    variant="h5"
+                    align="center"
+                    sx={{
+                      mt: 6,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      fontSize: '200%'
+                    }}
+                  >
+                    {data[index].key}
+                  </Typography>
+                </CardContent>
+              </Card>
 
-          <Card
-            sx={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              backfaceVisibility: 'hidden',
-              transform: 'rotateY(180deg)',
-              boxShadow: 4,
-              borderRadius: 4,
-              bgcolor: '#1e272e',
-              color: 'white'
-            }}
-          >
-            <CardContent>
-              <Typography
-                variant="h6"
+              <Card
                 sx={{
-                  mt: 6,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '200%'
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  backfaceVisibility: 'hidden',
+                  transform: 'rotateY(180deg)',
+                  boxShadow: 4,
+                  borderRadius: 4,
+                  bgcolor: '#1e272e',
+                  color: 'white'
                 }}
               >
-                {current.value}
-              </Typography>
-            </CardContent>
-          </Card>
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mt: 6,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      fontSize: '200%'
+                    }}
+                  >
+                    {data[index].value}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </motion.div>
       </motion.div>
 
       <Box mt={4} display="flex" gap={2}>
-        <Button variant="contained" color="secondary" onClick={handlePrev} disabled={index === 0}>
+        <Button variant="contained" color="secondary" onClick={() => handlePrev()} disabled={index === 0}>
           ⬅ Trước
         </Button>
-        <Button variant="contained" color="primary" onClick={handleNext} disabled={index === total - 1}>
+        <Button variant="contained" color="primary" onClick={() => handleNext()} disabled={index === total - 1}>
           Tiếp ➡
         </Button>
       </Box>
@@ -152,14 +171,4 @@ const FlashcardPage = ({ data }) => {
     </Box>
   );
 };
-
-const sampleData = [
-  { key: 'Aberration', value: 'Sự sai lệch, khác thường' },
-  { key: 'Benevolent', value: 'Nhân từ, nhân ái' },
-  { key: 'Cacophony', value: 'Âm thanh chói tai' },
-  { key: 'Diligent', value: 'Siêng năng, cần cù' }
-];
-
-export default function App() {
-  return <FlashcardPage data={sampleData} />;
-}
+export default FlashcardPage;

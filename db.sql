@@ -67,7 +67,7 @@ CREATE TABLE question
 (
     question_id           BIGINT AUTO_INCREMENT PRIMARY KEY,
     assignment_section_id BIGINT       NOT NULL,
-    question_material_id  BIGINT       NOT NULL,
+    question_material_id  BIGINT       ,
     question_content      TEXT         NOT NULL,
     type                  VARCHAR(50)  NOT NULL,
     question_explain      TEXT         NULL,
@@ -186,6 +186,15 @@ CREATE TABLE flashcard_materials (
     flashcard_id BIGINT,
     CONSTRAINT fk_flashcard FOREIGN KEY (flashcard_id) REFERENCES flashcards(flashcard_id) ON DELETE CASCADE
 );
+CREATE TABLE mcq_answer (
+    mcqa_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    question_id BIGINT,
+    answer_content VARCHAR(255),
+    is_correct TINYINT(1),
+    CONSTRAINT fk_mcq_answer_question 
+        FOREIGN KEY (question_id) REFERENCES question(question_id)
+);
+
 
 use lms;
 INSERT INTO flashcards (title, description, created_at, courses_version_id)
@@ -282,7 +291,8 @@ VALUES
 ('user17@example.com', '123456', 'User17', 1, NOW()),
 ('user18@example.com', '123456', 'User18', 1, NOW()),
 ('user19@example.com', '123456', 'User19', 1, NOW()),
-('user20@example.com', '123456', 'User20', 1, NOW());
+('user20@example.com', '123456', 'User20', 1, NOW()),
+('user21@example.com', '123456', 'User21', 1, NOW());
 
 -- ========================
 -- STUDENT (20 records)
@@ -308,7 +318,8 @@ VALUES
 (17, '2000-05-30', 'HCM', NOW(), NOW()),
 (18, '2001-06-15', 'Nghe An', NOW(), NOW()),
 (19, '2002-07-22', 'Quang Nam', NOW(), NOW()),
-(20, '2003-08-05', 'Hai Duong', NOW(), NOW());
+(20, '2003-08-05', 'Hai Duong', NOW(), NOW()),
+(21, '2003-08-05', 'Hai Duong', NOW(), NOW());
 
 -- ========================
 -- CLASSES (20 records)
@@ -331,7 +342,7 @@ VALUES
 (1,1),(2,2),(3,3),(4,4),(5,5),
 (6,6),(7,7),(8,8),(9,9),(10,10),
 (11,11),(12,12),(13,13),(14,14),(15,15),
-(16,16),(17,17),(18,18),(19,19),(20,20);
+(16,16),(17,17),(18,18),(19,19),(20,20), (21,20);
 
 -- ========================
 -- ASSIGNMENT (20 records)

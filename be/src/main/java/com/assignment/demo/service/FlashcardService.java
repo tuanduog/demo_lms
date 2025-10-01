@@ -12,7 +12,7 @@ public class FlashcardService {
 
     @Autowired
     FlashcardRepository flashcardRepository;
-//    public List<FlashcardDetailDTO> getFlashcardById(Long id){
-//
-//    }
+    public List<FlashcardDetailDTO> getFlashcardById(Long id){
+        return flashcardRepository.findAllByFlashcard_Id(id);
+    }
 }

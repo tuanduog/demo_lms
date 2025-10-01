@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ScoreVersionRepository  extends JpaRepository<ScoreVersion,Integer> {
+public interface ScoreVersionRepository  extends JpaRepository<ScoreVersion,Long> {
     Optional<ScoreVersion> findTopByScoreReport_IdOrderByModifiedAtDesc(Long id);
 }

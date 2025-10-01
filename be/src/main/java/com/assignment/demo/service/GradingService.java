@@ -47,7 +47,6 @@ public class GradingService {
             score+=qs.getScore();
         }
         questionSubmissionRepository.saveAll(submissionList);
-        System.out.println("scoreeeee"+ score);
         ScoreVersion sv=scoreVersionRepository.findTopByScoreReport_IdOrderByModifiedAtDesc(id).orElse(null);
 //        if(sv!=null){
 //            sv.setScore(score+sv.getScore());

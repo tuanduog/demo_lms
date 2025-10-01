@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "assignment_section")
 @Data
@@ -29,8 +32,12 @@ public class AssignmentSection {
     @Column(name = "name")
     private String name;
 
+
     @Column(name = "question_type")
     private String questionType;
+
+    @OneToMany(mappedBy = "assignmentSection")
+    private List<Question> questions = new ArrayList<>();
     public AssignmentSection(Assignment assignment, QuestionMaterial questionMaterial, String name, String questionType) {
         this.assignment = assignment;
         this.questionMaterial = questionMaterial;

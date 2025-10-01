@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SubmissionService {
     @Autowired
     ScoreReportRepository scoreReportRepository;
+    @Autowired
+    ScoreVersionRepository scoreVersionRepository;
     @Autowired
     StudentRepository studentRepository;
     @Autowired
@@ -27,41 +27,59 @@ public class SubmissionService {
     AssignmentSectionSubmissionRepository assignmentSectionSubmissionRepository;
     @Autowired
     QuestionSubmissionRepository questionSubmissionRepository;
+    @Autowired
+    MCQAnswerService mcqAnswerService;
 
-    public void submitAnswer(Long assignmentID, Long scoreReportID, List<QuestionAnswerDTO> list){
-        List<AssignmentSection> sectionList= assignmentSectionRepository.findByAssignmentId(assignmentID);
-        for(AssignmentSection as: sectionList){
+    public void submitAnswer(Long assignmentID, Long scoreReportID, Long scoreVersionID,List<QuestionAnswerDTO> list){
+        Set<Long> sectionIds = list.stream()
+                .map(QuestionAnswerDTO::getSectionID)
+                .collect(Collectors.toSet());
+
+        for (Long sectionId : sectionIds) {
+            AssignmentSection as = assignmentSectionRepository.getReferenceById(sectionId);
             assignmentSectionSubmissionRepository.save(new AssignmentSectionSubmission(
-                    as,null, LocalDateTime.now()
+                    as,
+                    null,
+                    LocalDateTime.now()
             ));
-            if(as.getQuestionType().equalsIgnoreCase("MultipleChoice")||
-                    as.getQuestionType().equalsIgnoreCase("Blank")){
-                submitAutoGrading(scoreReportID,as.getID(),list);
-            }
-            else{
-                submitManualGrading(scoreReportID,as.getID(),list);
+            if (as.getQuestionType().equalsIgnoreCase("MCQ") || as.getQuestionType().equalsIgnoreCase("Blank")) {
+                submitAutoGrading(scoreReportID, sectionId, list, assignmentID, scoreVersionID);
+            } else {
+                submitManualGrading(scoreReportID, sectionId, list);
             }
         }
+
     }
-    public void submitAutoGrading(Long scoreReportID, long sectionID, List<QuestionAnswerDTO> list){
+    public void submitAutoGrading(Long scoreReportID, long sectionID, List<QuestionAnswerDTO> list, Long assignmentID, Long scoreVersionID){
         List<QuestionSubmission> questionSubmissions= new ArrayList<>();
         List<CorrectAnswerDTO> answerList=null;
-        Map<Long, CorrectAnswerDTO> answerMap=null;
+        System.out.println("second id:"+ assignmentID);
+        Map<Long, String> answerMap=mcqAnswerService.getCorrectAnswerByAssignment_Id(assignmentID);
+        System.out.println("mapp:"+answerMap);
+        double count=0;
         try{
             for(QuestionAnswerDTO answer: list ){
                 if(answer.getSectionID()==sectionID){
                     questionSubmissions.add(new QuestionSubmission(
                             scoreReportRepository.getReferenceById(scoreReportID),
-                            assignmentSectionRepository.getReferenceById(Math.toIntExact(answer.getSectionID())),
+                            assignmentSectionRepository.getReferenceById(answer.getSectionID()),
                             questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
                             answer.getStudentAnswer(),
-                            null,
-                            answer.getStudentAnswer().equalsIgnoreCase(answerMap.get(answer.getQuestionID()).getAnswerContent()),
+                            (answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer())? 1.0:0.0),
+                            answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer()),
                             null
                     ));
+                    if(answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer())){
+                        count++;
+                    }
                 }
             }
             questionSubmissionRepository.saveAll(questionSubmissions);
+            ScoreVersion newScore= scoreVersionRepository.findById(scoreVersionID).orElse(null);
+            if( newScore!= null){
+                newScore.setScore(count);
+                scoreVersionRepository.save(newScore);
+            }
         }
         catch (Exception e){
             e.printStackTrace();
@@ -73,7 +91,7 @@ public class SubmissionService {
             if(answer.getSectionID()==sectionID){
                 questionSubmissions.add(new QuestionSubmission(
                     scoreReportRepository.getReferenceById(scoreReportID),
-                        assignmentSectionRepository.getReferenceById(Math.toIntExact(answer.getSectionID())),
+                        assignmentSectionRepository.getReferenceById(answer.getSectionID()),
                         questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
                         answer.getStudentAnswer(),
                         null,

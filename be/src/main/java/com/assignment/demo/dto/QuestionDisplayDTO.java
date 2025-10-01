@@ -15,7 +15,7 @@ public class QuestionDisplayDTO {
     private String questionType;
     private String materialURL;
     private String questionContent;
-    private List<String> answerList;
+    private List<CorrectAnswerDTO> answerList;
 
     public QuestionDisplayDTO(Long questionId, Long assignmentSectionId, String questionType, String materialURL, String questionContent) {
         this.questionId = questionId;

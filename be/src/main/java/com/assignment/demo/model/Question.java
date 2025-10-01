@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "question")
@@ -36,5 +38,8 @@ public class Question {
 
     @Column(name = "question_explain", columnDefinition = "TEXT")
     private String questionExplain;
+    @OneToMany(mappedBy = "question")
+    private List<MCQAnswer> mcqAnswers = new ArrayList<>();
+
 
 }

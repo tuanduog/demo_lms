@@ -1,10 +1,12 @@
 package com.assignment.demo.service;
 
 import com.assignment.demo.dto.AssignmentFormBasicDTO;
+import com.assignment.demo.dto.AssignmentRequest;
 import com.assignment.demo.model.Assignment;
 import com.assignment.demo.repository.AssignmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -21,5 +23,14 @@ public class AssignmentService {
     }
     public Assignment getOneById(Long id){
         return assignmentRepository.findById(id).orElse(null);
+    }
+
+    public Assignment addAssignment(@RequestBody AssignmentRequest assignment){
+        Assignment newAssignment = new Assignment();
+        newAssignment.setTitle(assignment.getTitle());
+        newAssignment.setDescription(assignment.getDescription());
+        newAssignment.setDuration(assignment.getDuration());
+        newAssignment.setEndTime(assignment.getDeadline());
+        return assignmentRepository.save(newAssignment);
     }
 }

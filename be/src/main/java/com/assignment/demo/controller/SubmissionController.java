@@ -6,10 +6,7 @@ import com.assignment.demo.dto.QuestionAnswerDTO;
 import com.assignment.demo.dto.QuestionDisplayDTO;
 import com.assignment.demo.model.*;
 import com.assignment.demo.repository.AssignmentRepository;
-import com.assignment.demo.service.AssignmentService;
-import com.assignment.demo.service.QuestionService;
-import com.assignment.demo.service.ScoreReportService;
-import com.assignment.demo.service.SubmissionService;
+import com.assignment.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +27,8 @@ public class SubmissionController {
     AssignmentService assignmentService;
     @Autowired
     QuestionService questionService;
+    @Autowired
+    StudentService studentService;
     @GetMapping
     public List<Assignment> getAllAssignment(){
         return assignmentService.getAll();
@@ -38,6 +37,11 @@ public class SubmissionController {
     public AssignmentFormDetailDTO getAssignmentDetail(@PathVariable Long id){
         Assignment assignment= assignmentService.getOneById(id);
         List<QuestionDisplayDTO> questionList= questionService.getQuestionListByAssignment_Id(id);
+        for( QuestionDisplayDTO question: questionList){
+            if(question.getQuestionType().equalsIgnoreCase("mcq")){
+                question.setAnswerList(questionService.findByQuestion_Id(question.getQuestionId()));
+            }
+        }
         return new AssignmentFormDetailDTO(
                 assignment.getId(),
                 assignment.getTitle(),
@@ -53,15 +57,16 @@ public class SubmissionController {
     }
     @PostMapping("/{id}")
     public String submitAssignment(@PathVariable Long id, @RequestBody List<QuestionAnswerDTO> answerList){
+        System.out.println("first id:"+ id);
         Long scoreReportID= scoreReportService.addAndGetScoreReport(
                 new ScoreReport(
                         assignmentService.getAssignmentByRefer(id),
-                        new Student(),
+                        studentService.getStudentByRefer(21l),
                         LocalDateTime.now(),
                         "Pending"
                 )
         );
-        scoreReportService.addScoreVersion(
+        Long scoreVersionID=scoreReportService.addScoreVersion(
                 new ScoreVersion(
                         scoreReportService.getScoreReportByRefer(scoreReportID),
                         null,
@@ -69,7 +74,7 @@ public class SubmissionController {
                         LocalDateTime.now()
                 )
         );
-        submissionService.submitAnswer(id,scoreReportID,answerList);
+        submissionService.submitAnswer(id,scoreReportID,scoreVersionID,answerList);
         return "Completed";
     }
 

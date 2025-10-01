@@ -1,9 +1,9 @@
 package com.assignment.demo.repository;
 
-import com.assignment.demo.model.Student;
+import com.assignment.demo.model.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student,Long> {
+public interface CourseRepository extends JpaRepository<Course,Long> {
 }

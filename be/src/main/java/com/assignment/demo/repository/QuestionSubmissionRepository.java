@@ -17,7 +17,7 @@ public interface QuestionSubmissionRepository extends JpaRepository<QuestionSubm
             FROM QuestionSubmission qs 
             JOIN qs.assignmentSection as
             JOIN qs.question q
-            
+            WHERE qs.scoreReport.id=:id
             
             """)
     List<QuestionSubmissionDTO> findAllByScoreReport_Id(Long id);

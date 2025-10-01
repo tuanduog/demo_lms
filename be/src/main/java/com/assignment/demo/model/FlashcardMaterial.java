@@ -10,7 +10,7 @@ public class FlashcardMaterial {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "flashcard_material_id")
-    private Long flashcardMaterialId;
+    private Long id;
 
     @Column(name = "quizlet_id")
     private Long quizletId;

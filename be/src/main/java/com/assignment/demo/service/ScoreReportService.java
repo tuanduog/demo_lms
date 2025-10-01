@@ -30,8 +30,8 @@ public class ScoreReportService {
         return scoreReportRepository.save(scoreReport).getId();
     }
 
-    public void addScoreVersion(ScoreVersion scoreVersion){
-        scoreVersionRepository.save(scoreVersion);
+    public Long addScoreVersion(ScoreVersion scoreVersion){
+        return scoreVersionRepository.save(scoreVersion).getId();
     }
     public ScoreReport getScoreReportByRefer(Long id){
        return scoreReportRepository.getReferenceById(id);

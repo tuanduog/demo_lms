@@ -13,7 +13,7 @@ const data = [
 
 const SkillRadar = () => {
   return (
-    <Card sx={{ width: 600, mx: 'auto', mt: 4, boxShadow: 4 }}>
+    <Card sx={{ width: 600, mx: 'auto', mt: 4, boxShadow: 5 }}>
       <CardContent>
         <Typography variant="h5" fontWeight="bold" textAlign="center" gutterBottom>
           🕸️ Kỹ năng tổng quan
@@ -22,7 +22,7 @@ const SkillRadar = () => {
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid />
             <PolarAngleAxis dataKey="subject" />
-            {/* <PolarRadiusAxis angle={180} /> */}
+            <PolarRadiusAxis angle={180} />
             <Tooltip />
             <Radar name="Năng lực" dataKey="A" stroke="#1976d2" fill="#1976d2" fillOpacity={0.6} />
           </RadarChart>
