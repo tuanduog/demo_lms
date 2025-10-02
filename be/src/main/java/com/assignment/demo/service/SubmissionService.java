@@ -60,18 +60,33 @@ public class SubmissionService {
         try{
             for(QuestionAnswerDTO answer: list ){
                 if(answer.getSectionID()==sectionID){
-                    questionSubmissions.add(new QuestionSubmission(
-                            scoreReportRepository.getReferenceById(scoreReportID),
-                            assignmentSectionRepository.getReferenceById(answer.getSectionID()),
-                            questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
-                            answer.getStudentAnswer(),
-                            (answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer())? 1.0:0.0),
-                            answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer()),
-                            null
-                    ));
-                    if(answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer())){
-                        count++;
+                    if(answer.getStudentAnswer()!=null || answer.getFile() !=null){
+                        questionSubmissions.add(new QuestionSubmission(
+                                scoreReportRepository.getReferenceById(scoreReportID),
+                                assignmentSectionRepository.getReferenceById(answer.getSectionID()),
+                                questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
+                                answer.getStudentAnswer(),
+                                (answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer())? 1.0:0.0),
+                                answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer()),
+                                null
+                        ));
+                        if(answerMap.get(answer.getQuestionID()).equalsIgnoreCase(answer.getStudentAnswer())){
+                            count++;
+                        }
                     }
+                    else{
+                        questionSubmissions.add(new QuestionSubmission(
+                                scoreReportRepository.getReferenceById(scoreReportID),
+                                assignmentSectionRepository.getReferenceById(answer.getSectionID()),
+                                questionRepository.getReferenceById(Math.toIntExact(answer.getQuestionID())),
+                                answer.getStudentAnswer(),
+                                0.0,
+                                false,
+                                null
+                        ));
+                    }
+
+
                 }
             }
             questionSubmissionRepository.saveAll(questionSubmissions);

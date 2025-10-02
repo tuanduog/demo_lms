@@ -125,21 +125,27 @@ const SubmissionPage = () => {
   };
 
   const handleSubmit = async () => {
-    const formatted = Object.entries(answers).map(([questionId, ans]) => {
-      const q = assignment.questionList.find((q) => q.questionId === Number(questionId));
+    const formatted = assignment.questionList.map((q) => {
+      const ans = answers[q.questionId] || {};
+      if (!ans.choice && !ans.text && !ans.file) {
+        alert(` Vui lòng hoàn thành tất cả câu hỏi để nộp bài.`);
+        return;
+      }
       return {
-        questionID: Number(questionId),
-        sectionID: q?.assignmentSectionId || null,
-        studentAnswer: ans.choice || ans.text || '',
+        questionID: q.questionId,
+        sectionID: q.assignmentSectionId || null,
+        studentAnswer: ans.choice || ans.text || null,
         file: ans.file || null
       };
     });
+
     console.log('📤 Nộp bài với đáp án:', formatted);
+
     try {
       const response = await axios.post(`http://localhost:8080/test/${id}`, formatted, {
         headers: { 'Content-Type': 'application/json' }
       });
-      alert(response.data || 'thanh cong');
+      alert(response.data || 'Thành công');
     } catch (err) {
       console.log(err);
     }
@@ -204,7 +210,7 @@ const SubmissionPage = () => {
 
       {sections.map((sectionId, index) => (
         <Box key={sectionId} hidden={tabValue !== index}>
-          {/* 📁 Gom nhóm câu hỏi theo materialURL */}
+          {/*  Gom nhóm câu hỏi theo materialURL */}
           {Object.entries(
             assignment.questionList
               .filter((q) => q.assignmentSectionId === sectionId)
@@ -216,12 +222,11 @@ const SubmissionPage = () => {
           ).map(([materialURL, questions], groupIdx) => (
             <Card key={groupIdx} sx={{ mb: 4, borderRadius: 3, boxShadow: 3 }}>
               <CardContent>
-                {/* 📄 Tài liệu hiển thị 1 lần duy nhất */}
-                {materialURL && (
+                {materialURL !== 'null' ? (
                   <Box mb={3}>
                     <Link href={materialURL} target="_blank" rel="noopener" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       {materialURL.endsWith('.pdf') ? <PictureAsPdfIcon color="error" /> : <ImageIcon color="primary" />}
-                      <Typography variant="h6">📚 Tài liệu tham khảo</Typography>
+                      <Typography variant="h6"> Tài liệu tham khảo</Typography>
                     </Link>
 
                     {materialURL.endsWith('.pdf') ? (
@@ -238,15 +243,15 @@ const SubmissionPage = () => {
                       </Box>
                     )}
                   </Box>
-                )}
+                ) : null}
 
-                {/* 📝 Danh sách câu hỏi thuộc cùng tài liệu */}
+                {/*  Danh sách câu hỏi thuộc cùng tài liệu */}
                 {questions.map((q, idx) => (
                   <Box key={q.questionId} sx={{ mb: 4 }}>
                     <Typography variant="h6" mb={1}>
                       Câu {q.questionId}: {q.questionContent}
                     </Typography>
-                    {/* 🧠 Input theo loại câu hỏi */}
+                    {/*  Input theo loại câu hỏi */}
                     {q.questionType === 'mcq' && (
                       <RadioGroup
                         value={answers[q.questionId]?.choice || ''}

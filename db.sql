@@ -67,7 +67,7 @@ CREATE TABLE question
 (
     question_id           BIGINT AUTO_INCREMENT PRIMARY KEY,
     assignment_section_id BIGINT       NOT NULL,
-    question_material_id  BIGINT       ,
+    question_material_id  BIGINT       NULL,
     question_content      TEXT         NOT NULL,
     type                  VARCHAR(50)  NOT NULL,
     question_explain      TEXT         NULL,

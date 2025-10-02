@@ -25,11 +25,10 @@ VALUES
 -- ========================
 -- TẠO ASSIGNMENT SECTION CHO 40 CÂU (1 section)
 -- ========================
-INSERT INTO assignment_section (name, question_type, assignment_id, question_material_id)
-SELECT 'IELTS Vocabulary Section', 'mcq', @assignment_id, question_material_id
-FROM question_material
-ORDER BY question_material_id
-LIMIT 40;
+INSERT INTO assignment_section (name, question_type, assignment_id)
+VALUES ('IELTS Vocabulary Section - Part 1', 'mcq', @assignment_id);
+INSERT INTO assignment_section (name, question_type, assignment_id)
+VALUES ('IELTS Vocabulary Section - Part 2', 'blank', @assignment_id);
 
 -- ========================
 -- TẠO 40 QUESTION
@@ -37,23 +36,24 @@ LIMIT 40;
 -- Lưu ý: gán question_material_id và assignment_section_id
 -- Giả sử assignment_section_id vừa tạo là 100 (bạn có thể lấy LAST_INSERT_ID() nếu cần)
 -- Thay 100 bằng giá trị thực tế của assignment_section_id
-SET @section_id = (SELECT assignment_section_id FROM assignment_section WHERE assignment_id = @assignment_id LIMIT 1);
+SET @section_id = 21;
+SET @section_id_blank = 22;
 
 INSERT INTO question (assignment_section_id, question_material_id, question_content, type, question_explain)
 VALUES
-(@section_id, 1, 'Choose the correct synonym for "alleviate"', 'mcq', 'To reduce or make less severe'),
-(@section_id, 2, 'Choose the correct antonym for "benevolent"', 'mcq', 'Opposite of kind and generous'),
-(@section_id, 3, 'Select the word that best fits the context: "He showed remarkable ___ in negotiations."', 'mcq', 'Skill and diplomacy'),
-(@section_id, 4, 'Which word is closest in meaning to "candid"?', 'mcq', 'Truthful and straightforward'),
-(@section_id, 5, 'Choose the correct usage of "detrimental" in a sentence', 'mcq', 'Harmful or damaging'),
-(@section_id, 6, 'Select the synonym for "elucidate"', 'mcq', 'To make clear or explain'),
-(@section_id, 7, 'Choose the correct meaning of "fallacious"', 'mcq', 'Based on mistaken belief'),
-(@section_id, 8, 'Identify the word that best completes: "Her actions were ___ to the cause."', 'mcq', 'Helpful and supportive'),
-(@section_id, 9, 'Select the word that is opposite of "garrulous"', 'mcq', 'Talkative'),
-(@section_id, 10, 'Choose the correct usage of "harbinger"', 'mcq', 'Something that signals a future event'),
-(@section_id, 11, 'Pick the synonym of "impeccable"', 'mcq', 'Flawless or perfect'),
-(@section_id, 12, 'Choose the correct antonym of "jubilant"', 'mcq', 'Extremely happy'),
-(@section_id, 13, 'Select the word that best fits: "The study was highly ___"', 'mcq', 'Influential or authoritative'),
+(@section_id, 21, 'Choose the correct synonym for "alleviate"', 'mcq', 'To reduce or make less severe'),
+(@section_id, 21, 'Choose the correct antonym for "benevolent"', 'mcq', 'Opposite of kind and generous'),
+(@section_id, 21, 'Select the word that best fits the context: "He showed remarkable ___ in negotiations."', 'mcq', 'Skill and diplomacy'),
+(@section_id, 21, 'Which word is closest in meaning to "candid"?', 'mcq', 'Truthful and straightforward'),
+(@section_id, 21, 'Choose the correct usage of "detrimental" in a sentence', 'mcq', 'Harmful or damaging'),
+(@section_id, 21, 'Select the synonym for "elucidate"', 'mcq', 'To make clear or explain'),
+(@section_id, 21, 'Choose the correct meaning of "fallacious"', 'mcq', 'Based on mistaken belief'),
+(@section_id, 21, 'Identify the word that best completes: "Her actions were ___ to the cause."', 'mcq', 'Helpful and supportive'),
+(@section_id, 21, 'Select the word that is opposite of "garrulous"', 'mcq', 'Talkative'),
+(@section_id, 21, 'Choose the correct usage of "harbinger"', 'mcq', 'Something that signals a future event'),
+(@section_id, 21, 'Pick the synonym of "impeccable"', 'mcq', 'Flawless or perfect'),
+(@section_id, 21, 'Choose the correct antonym of "jubilant"', 'mcq', 'Extremely happy'),
+(@section_id, 21, 'Select the word that best fits: "The study was highly ___"', 'mcq', 'Influential or authoritative'),
 (@section_id, 14, 'Which word is closest in meaning to "meticulous"?', 'mcq', 'Extremely careful and precise'),
 (@section_id, 15, 'Choose the correct usage of "nonchalant"', 'mcq', 'Calm and unconcerned'),
 (@section_id, 16, 'Select the synonym for "obfuscate"', 'mcq', 'To make unclear or confusing'),
@@ -80,7 +80,17 @@ VALUES
 (@section_id, 37, 'Choose the correct meaning of "fortuitous"', 'mcq', 'Happening by chance'),
 (@section_id, 38, 'Identify the word that best completes: "The team remained ___ despite difficulties."', 'mcq', 'Optimistic or hopeful'),
 (@section_id, 39, 'Select the word opposite of "gregarious"', 'mcq', 'Shy or reserved'),
-(@section_id, 40, 'Choose the correct usage of "haughty"', 'mcq', 'Arrogant or disdainful');
+(@section_id, 40, 'Choose the correct usage of "haughty"', 'mcq', 'Arrogant or disdainful'),
+(@section_id_blank, 40, 'Fill in the blank: The scientist’s discovery was so {groundbreaking} that it changed the field entirely.', 'blank', 'Think of a word meaning "groundbreaking" or "revolutionary"'),
+(@section_id_blank, 40, 'Complete the sentence: Her argument was both logical and {persuasive}.', 'blank', 'Look for a word meaning "convincing" or "persuasive"'),
+(@section_id_blank, 40, 'Fill in the blank: Despite the storm, the ship remained {steady} and reached the shore safely.', 'blank', 'Use a word meaning "steady" or "unshaken"'),
+(@section_id_blank, null, 'Complete the sentence: The student’s explanation was {lucid} and helped the class understand the concept.', 'blank', 'Think of a word meaning "clear" or "lucid"'),
+(@section_id_blank, null, 'Fill in the blank: The politician’s {offensive} remarks caused outrage among the public.', 'blank', 'Use a word meaning "offensive" or "insensitive"'),
+(@section_id_blank, null, 'Complete the sentence: The solution was {surprisingly} simple, yet incredibly effective.', 'blank', 'A word meaning "deceptively" or "surprisingly"'),
+(@section_id_blank, null, 'Fill in the blank: Over time, the monument became a {enduring} symbol of national pride.', 'blank', 'Use a word meaning "lasting" or "enduring"'),
+(@section_id_blank, null, 'Complete the sentence: His actions were {consistent} with his principles.', 'blank', 'Think of a word meaning "consistent" or "aligned"'),
+(@section_id_blank, null, 'Fill in the blank: The medicine had an {immediate} effect on the patient’s condition.', 'blank', 'A word meaning "immediate" or "instantaneous"'),
+(@section_id_blank, null, 'Complete the sentence: She gave a {detailed} account of the events that transpired.', 'blank', 'Use a word meaning "detailed" or "thorough"');
 
 -- ========================
 -- THÊM MCQ ANSWER CHO 40 CÂU (question_id từ 21 đến 60)
