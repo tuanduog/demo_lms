@@ -57,7 +57,6 @@ public class SubmissionController {
     }
     @PostMapping("/{id}")
     public String submitAssignment(@PathVariable Long id, @RequestBody List<QuestionAnswerDTO> answerList){
-        System.out.println("first id:"+ id);
         Long scoreReportID= scoreReportService.addAndGetScoreReport(
                 new ScoreReport(
                         assignmentService.getAssignmentByRefer(id),

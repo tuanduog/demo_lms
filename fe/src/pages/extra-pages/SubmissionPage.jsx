@@ -100,6 +100,7 @@ const SubmissionPage = () => {
         if (prev <= 1) {
           clearInterval(timer);
           alert('Hết giờ làm bài!');
+          handleSubmit();
           return 0;
         }
         return prev - 1;
@@ -127,10 +128,10 @@ const SubmissionPage = () => {
   const handleSubmit = async () => {
     const formatted = assignment.questionList.map((q) => {
       const ans = answers[q.questionId] || {};
-      if (!ans.choice && !ans.text && !ans.file) {
-        alert(` Vui lòng hoàn thành tất cả câu hỏi để nộp bài.`);
-        return;
-      }
+      // if (!ans.choice && !ans.text && !ans.file) {
+      //   alert(` Vui lòng hoàn thành tất cả câu hỏi để nộp bài.`);
+      //   return;
+      // }
       return {
         questionID: q.questionId,
         sectionID: q.assignmentSectionId || null,
@@ -239,7 +240,11 @@ const SubmissionPage = () => {
                       ></iframe>
                     ) : (
                       <Box textAlign="center" mt={2}>
-                        <img src={materialURL} alt="Material" style={{ maxWidth: '100%', borderRadius: '8px', border: '1px solid #ccc' }} />
+                        <img
+                          src={materialURL}
+                          alt="Material"
+                          style={{ width: '50%', height: '300px', borderRadius: '8px', border: '1px solid #ccc' }}
+                        />
                       </Box>
                     )}
                   </Box>

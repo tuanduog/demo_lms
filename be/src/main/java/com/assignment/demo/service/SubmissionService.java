@@ -53,7 +53,6 @@ public class SubmissionService {
     public void submitAutoGrading(Long scoreReportID, long sectionID, List<QuestionAnswerDTO> list, Long assignmentID, Long scoreVersionID){
         List<QuestionSubmission> questionSubmissions= new ArrayList<>();
         List<CorrectAnswerDTO> answerList=null;
-        System.out.println("second id:"+ assignmentID);
         Map<Long, String> answerMap=mcqAnswerService.getCorrectAnswerByAssignment_Id(assignmentID);
         System.out.println("mapp:"+answerMap);
         double count=0;
@@ -92,6 +91,7 @@ public class SubmissionService {
             questionSubmissionRepository.saveAll(questionSubmissions);
             ScoreVersion newScore= scoreVersionRepository.findById(scoreVersionID).orElse(null);
             if( newScore!= null){
+                System.out.println("new scoreL: "+ count);
                 newScore.setScore(count);
                 scoreVersionRepository.save(newScore);
             }
